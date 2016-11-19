@@ -22,6 +22,7 @@ instance ( HasServer (AddSetCookieApi api) ctxs, AreAuths auths ctxs v
          , ToJWT v
          , HasContextEntry ctxs CookieSettings
          , HasContextEntry ctxs JWTSettings
+         , Show v
          ) => HasServer (Auth auths v :> api) ctxs where
   type ServerT (Auth auths v :> api) m = AuthResult v -> ServerT api m
 

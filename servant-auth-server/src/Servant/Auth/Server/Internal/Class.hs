@@ -16,7 +16,7 @@ import Servant.Auth.Server.Internal.JWT
 -- returns an @AuthCheck v@.
 class IsAuth a v  where
   type family AuthArgs a :: [*]
-  runAuth :: proxy a -> proxy v -> Unapp (AuthArgs a) (AuthCheck v)
+  runAuth :: Show v => proxy a -> proxy v -> Unapp (AuthArgs a) (AuthCheck v)
 
 instance FromJWT usr => IsAuth Cookie usr where
   type AuthArgs Cookie = '[CookieSettings, JWTSettings]
@@ -33,7 +33,7 @@ instance FromBasicAuthData usr => IsAuth BasicAuth usr where
 -- * Helper
 
 class AreAuths (as :: [*]) (ctxs :: [*]) v where
-  runAuths :: proxy as -> Context ctxs -> AuthCheck v
+  runAuths :: Show v => proxy as -> Context ctxs -> AuthCheck v
 
 instance  AreAuths '[] ctxs v where
   runAuths _ _ = mempty
