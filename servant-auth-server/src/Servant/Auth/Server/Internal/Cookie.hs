@@ -26,22 +26,13 @@ cookieAuthCheck ccfg jwtCfg = do
   jwtCookie <- maybe mempty return $ do
     cookies' <- lookup "Cookie" $ requestHeaders req
     let cookies = parseCookies cookies'
-    xsrfCookie <- lookup (xsrfCookieName ccfg) cookies
-    traceShowM "xsrf"
-    traceShowM xsrfCookie
-    xsrfHeader <- lookup (mk $ xsrfHeaderName ccfg) $ requestHeaders req
-    guard $ xsrfCookie `constTimeEq` xsrfHeader
     -- session cookie *must* be HttpOnly and Secure
-    traceShowM "pass guard"
     lookup (sessionCookieName ccfg) cookies
   verifiedJWT <- liftIO $ runExceptT $ do
     unverifiedJWT <- Jose.decodeCompact $ BSL.fromStrict jwtCookie
-    traceShowM "decode jwt"
-    traceShowM  unverifiedJWT
     Jose.validateJWSJWT (jwtSettingsToJwtValidationSettings jwtCfg)
                         (key jwtCfg)
                          unverifiedJWT
-    traceShowM "pass validation"
     return unverifiedJWT
   case verifiedJWT of
     Left (_ :: Jose.JWTError) -> mzero
