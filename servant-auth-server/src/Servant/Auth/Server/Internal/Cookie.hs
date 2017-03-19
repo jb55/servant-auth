@@ -28,10 +28,6 @@ cookieAuthCheck ccfg jwtCfg = do
   jwtCookie <- maybe mempty return $ do
     cookies' <- lookup "Cookie" $ requestHeaders req
     let cookies = parseCookies cookies'
-    xsrfCookie <- lookup (xsrfCookieName ccfg) cookies
-    xsrfHeader <- lookup (mk $ xsrfHeaderName ccfg) $ requestHeaders req
-    traceShowM (xsrfCookie, xsrfHeader)
-    guard $ xsrfCookie `constTimeEq` xsrfHeader
     -- session cookie *must* be HttpOnly and Secure
     lookup (sessionCookieName ccfg) cookies
   verifiedJWT <- liftIO $ runExceptT $ do
