@@ -3,6 +3,7 @@ module Servant.Auth.Server.Internal.Cookie where
 import           Blaze.ByteString.Builder (toByteString)
 import           Control.Monad.Except
 import           Control.Monad.Reader
+import Debug.Trace
 import qualified Crypto.JOSE              as Jose
 import qualified Crypto.JWT               as Jose
 import           Crypto.Util              (constTimeEq)
@@ -29,6 +30,7 @@ cookieAuthCheck ccfg jwtCfg = do
     let cookies = parseCookies cookies'
     xsrfCookie <- lookup (xsrfCookieName ccfg) cookies
     xsrfHeader <- lookup (mk $ xsrfHeaderName ccfg) $ requestHeaders req
+    traceShowM (xsrfCookie, xsrfHeader)
     guard $ xsrfCookie `constTimeEq` xsrfHeader
     -- session cookie *must* be HttpOnly and Secure
     lookup (sessionCookieName ccfg) cookies
